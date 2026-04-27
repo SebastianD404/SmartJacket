@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartJacket IoT Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <div class="app-shell">
+    <header class="topbar card">
+      <div class="brand-wrap">
+        <div class="brand-mark" aria-hidden="true">SJ</div>
+        <div>
+          <h1>SmartJacket</h1>
+          <p>IoT Thermal Dashboard</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="notificationButton" class="icon-btn" aria-label="Open notifications">
+          <span class="dot-badge" id="notificationCount">4</span>
+          <i data-lucide="bell" class="icon"></i>
+        </button>
+        <button id="settingsButton" class="icon-btn" aria-label="Open settings">
+          <i data-lucide="settings" class="icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="status-strip card panel-full">
+        <div>
+          <p class="network-state"><span class="signal-dot"></span><span id="networkText">Excellent</span></p>
+          <p class="muted" id="lastSyncText">0s ago</p>
+        </div>
+        <button class="pill-outline">Real-time Data</button>
+      </section>
+
+      <section id="overviewCard" class="overview-card card panel-full is-normal">
+        <div class="overview-left">
+          <div class="state-icon" id="stateIcon">
+            <i data-lucide="circle-check" class="state-icon-svg"></i>
+          </div>
+          <div>
+            <h2 id="overviewTitle">All Systems Normal</h2>
+            <p class="muted">System Overview</p>
+          </div>
+        </div>
+
+        <div class="overview-right">
+          <span class="chip chip-temp" id="overviewBodyTemp">36.5&deg;C</span>
+          <span class="chip chip-battery" id="overviewBattery">21%</span>
+          <span class="chip chip-mode" id="overviewMode">Auto</span>
+        </div>
+      </section>
+
+      <section class="card panel-span-8">
+        <div class="section-title-wrap">
+          <h3 class="section-title">Temperature Monitoring</h3>
+        </div>
+
+        <div class="temp-grid">
+          <article class="metric-card metric-red" id="bodyCard">
+            <p class="metric-label">Body Temp</p>
+            <p class="metric-value"><span id="bodyTemp">36.5</span> <small>&deg;C</small></p>
+            <p class="metric-sub" id="bodyCondition">Normal</p>
+          </article>
+
+          <article class="metric-card metric-green">
+            <p class="metric-label">Ambient Temp</p>
+            <p class="metric-value"><span id="ambientTemp">26.6</span> <small>&deg;C</small></p>
+            <p class="metric-sub">Outdoor reading</p>
+          </article>
+
+          <article class="metric-card metric-amber">
+            <p class="metric-label">Jacket Temp</p>
+            <p class="metric-value"><span id="jacketTemp">27.3</span> <small>&deg;C</small></p>
+            <p class="metric-sub">Mode: <span id="jacketModeText">auto</span></p>
+          </article>
+
+          <article class="metric-card metric-teal">
+            <p class="metric-label">Power Usage</p>
+            <p class="metric-value"><span id="powerUsage">8.8</span> <small>W</small></p>
+            <p class="metric-sub">Smart regulation active</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="card panel-span-4 battery-panel">
+        <div class="panel-head">
+          <h3>Battery Status</h3>
+          <span class="battery-icon"><i data-lucide="battery-medium"></i></span>
+        </div>
+        <p class="battery-value"><span id="batteryPercent">21</span>%</p>
+        <div class="battery-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="21">
+          <span id="batteryBar"></span>
+        </div>
+        <p class="muted soft-note">Time remaining: <span id="batteryEta">1 hrs 55 min</span></p>
+      </section>
+
+      <section class="card panel-span-6 jacket-controls">
+        <div class="panel-head">
+          <h3>Jacket Control</h3>
+          <span class="status-pill"><span class="signal-dot"></span>Connected</span>
+        </div>
+
+        <div class="mode-grid" id="modeGrid">
+          <button class="mode-btn active" data-mode="auto"><i data-lucide="zap"></i><span>Auto</span></button>
+          <button class="mode-btn" data-mode="cool"><i data-lucide="snowflake"></i><span>Cool</span></button>
+          <button class="mode-btn" data-mode="heat"><i data-lucide="flame"></i><span>Heat</span></button>
+          <button class="mode-btn" data-mode="off"><i data-lucide="power"></i><span>Off</span></button>
+        </div>
+
+        <div class="mode-caption" id="modeCaption">
+          Current mode: <strong>AUTO</strong><br />
+          System automatically adjusts based on body temperature.
+        </div>
+      </section>
+
+      <section class="card panel-span-6 trends-panel">
+        <div class="panel-head">
+          <h3>Temperature Trends</h3>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="tempChart"></canvas>
+        </div>
+      </section>
+
+      <section class="card panel-full alerts-panel">
+        <div class="panel-head">
+          <h3>Recent Alerts</h3>
+          <button id="clearAlerts" class="text-btn">Clear All</button>
+        </div>
+        <div id="alertsList" class="alerts-list"></div>
+      </section>
+    </main>
+
+    <footer class="footer-note">
+      Last updated: <span id="lastUpdated">--:--:--</span>
+    </footer>
+  </div>
+
+  <aside class="drawer" id="notificationDrawer" aria-hidden="true">
+    <div class="drawer-head">
+      <h3>Notifications</h3>
+      <button class="text-btn" id="closeNotificationDrawer">Close</button>
+    </div>
+    <p class="muted"><span id="drawerCount">4</span> notifications</p>
+    <div id="notificationList" class="alerts-list compact"></div>
+  </aside>
+
+  <aside class="drawer" id="settingsDrawer" aria-hidden="true">
+    <div class="drawer-head">
+      <h3>Settings</h3>
+      <button class="text-btn" id="closeSettingsDrawer">Close</button>
+    </div>
+    <p class="muted">Customize your SmartJacket preferences</p>
+
+    <section class="settings-card appearance-card">
+        <h4><i data-lucide="sun-medium"></i> Appearance</h4>
+      <div class="theme-row">
+          <button class="theme-btn" data-theme="light"><i data-lucide="sun"></i><span>Light</span></button>
+          <button class="theme-btn" data-theme="dark"><i data-lucide="moon"></i><span>Dark</span></button>
+          <button class="theme-btn active" data-theme="system"><i data-lucide="monitor"></i><span>System</span></button>
+      </div>
+    </section>
+
+    <section class="settings-card">
+      <h4><i data-lucide="bell"></i> Notifications</h4>
+      <div class="toggle-row">
+        <div>
+          <p>Push Notifications</p>
+          <small>Receive alerts and updates</small>
+        </div>
+        <label class="switch">
+          <input id="pushToggle" type="checkbox" checked />
+          <span></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <p>Sound Alerts</p>
+          <small>Play sound for critical alerts</small>
+        </div>
+        <label class="switch">
+          <input id="soundToggle" type="checkbox" />
+          <span></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="settings-card security-card">
+      <h4><i data-lucide="shield"></i> Privacy and Security</h4>
+      <p>Data encryption: <span class="tag-ok">Active</span></p>
+      <p class="muted">Health telemetry is stored locally and synced securely.</p>
+      <p class="warning-note">Important: This system is for personal comfort monitoring only.</p>
+    </section>
+
+    <section class="settings-card thermal-card">
+      <h4><i data-lucide="thermometer"></i> Temperature Control</h4>
+      <label for="highTempSlider">High Temperature Alert: <span id="highTempValue">38.0</span>&deg;C</label>
+      <input id="highTempSlider" type="range" min="36" max="40" step="0.1" value="38.0" />
+
+      <label for="lowTempSlider">Low Temperature Alert: <span id="lowTempValue">35.0</span>&deg;C</label>
+      <input id="lowTempSlider" type="range" min="30" max="36" step="0.1" value="35.0" />
+
+      <label for="batteryAlertSlider">Low Battery Alert: <span id="batteryAlertValue">20</span>%</label>
+      <input id="batteryAlertSlider" type="range" min="5" max="30" step="1" value="20" />
+    </section>
+
+    <section class="settings-card device-card">
+      <h4><i data-lucide="info"></i> Device Information</h4>
+      <p><span>Model</span><strong>Smart Jacket v2.0</strong></p>
+      <p><span>Firmware</span><strong>1.2.5</strong></p>
+      <p><span>Serial Number</span><strong>SJ-2026-4829</strong></p>
+      <p><span>Last Sync</span><strong id="settingsLastSync">--:--:--</strong></p>
+    </section>
+  </aside>
+
+  <div class="overlay" id="overlay" hidden></div>
+</body>
+</html>
