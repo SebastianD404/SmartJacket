@@ -1,8 +1,6 @@
 const state = {
   mode: "auto",
   bodyTemp: 36.5,
-  ambientTemp: 26.6,
-  jacketTemp: 27.3,
   battery: 21,
   powerUsage: 8.8,
   highThreshold: 38.0,
@@ -20,8 +18,6 @@ const state = {
   ],
   trendLabels: ["06:00", "06:05", "06:10", "06:15", "06:20", "06:25", "06:30", "06:35", "06:40", "06:45"],
   bodySeries: [36.5, 36.7, 36.6, 36.7, 36.5, 36.6, 36.8, 36.7, 36.6, 36.5],
-  ambientSeries: [26.1, 26.4, 26.5, 26.3, 26.2, 26.4, 26.7, 26.5, 26.6, 26.6],
-  jacketSeries: [27.1, 27.2, 27.4, 27.3, 27.1, 27.3, 27.5, 27.3, 27.2, 27.3],
   lastSyncMs: Date.now()
 };
 
@@ -33,9 +29,6 @@ const el = {
   overviewBattery: document.getElementById("overviewBattery"),
   overviewMode: document.getElementById("overviewMode"),
   bodyTemp: document.getElementById("bodyTemp"),
-  ambientTemp: document.getElementById("ambientTemp"),
-  jacketTemp: document.getElementById("jacketTemp"),
-  jacketModeText: document.getElementById("jacketModeText"),
   bodyCondition: document.getElementById("bodyCondition"),
   powerUsage: document.getElementById("powerUsage"),
   batteryPercent: document.getElementById("batteryPercent"),
@@ -121,8 +114,6 @@ function updateSensorData(data) {
   state.backendConnected = data.connected !== false;
   state.backendError = data.error || null;
   state.bodyTemp = Number(data.temperature);
-  state.ambientTemp = data.ambientTemp != null ? Number(data.ambientTemp) : state.ambientTemp;
-  state.jacketTemp = data.jacketTemp != null ? Number(data.jacketTemp) : state.jacketTemp;
   state.battery = data.battery != null ? Number(data.battery) : state.battery;
   state.powerUsage = data.powerUsage != null ? Number(data.powerUsage) : state.powerUsage;
   state.mode = parseBackendMode(data.status);
@@ -130,7 +121,7 @@ function updateSensorData(data) {
 
   const now = new Date();
   const label = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-  pushSeries(label, state.bodyTemp, state.ambientTemp, state.jacketTemp);
+  pushSeries(label, state.bodyTemp);
 }
 
 async function getSmartJacketHistory() {
@@ -152,8 +143,6 @@ async function getSmartJacketHistory() {
 
     state.trendLabels = labels;
     state.bodySeries = rows.map((row) => Number(row.temperature.toFixed(1)));
-    state.ambientSeries = rows.map((row) => Number(row.ambientTemp != null ? row.ambientTemp.toFixed(1) : state.ambientTemp.toFixed(1)));
-    state.jacketSeries = rows.map((row) => Number(row.jacketTemp != null ? row.jacketTemp.toFixed(1) : state.jacketTemp.toFixed(1)));
 
     syncChart();
   } catch (error) {
@@ -202,10 +191,7 @@ function renderOverview() {
 
 function renderVitals() {
   el.bodyTemp.textContent = state.bodyTemp.toFixed(1);
-  el.ambientTemp.textContent = state.ambientTemp.toFixed(1);
-  el.jacketTemp.textContent = state.jacketTemp.toFixed(1);
   el.powerUsage.textContent = state.powerUsage.toFixed(1);
-  el.jacketModeText.textContent = state.mode;
 
   el.batteryPercent.textContent = `${Math.round(state.battery)}`;
   el.batteryBar.style.width = `${clamp(state.battery, 0, 100)}%`;
@@ -314,22 +300,6 @@ function setupChart() {
           backgroundColor: "transparent",
           tension: 0.35,
           pointRadius: 2
-        },
-        {
-          label: "Ambient Temp",
-          data: state.ambientSeries,
-          borderColor: "#2f7cff",
-          backgroundColor: "transparent",
-          tension: 0.35,
-          pointRadius: 2
-        },
-        {
-          label: "Jacket Temp",
-          data: state.jacketSeries,
-          borderColor: "#0cad66",
-          backgroundColor: "transparent",
-          tension: 0.35,
-          pointRadius: 2
         }
       ]
     },
@@ -354,17 +324,13 @@ function setupChart() {
   });
 }
 
-function pushSeries(label, b, a, j) {
+function pushSeries(label, b) {
   state.trendLabels.push(label);
   state.bodySeries.push(Number(b.toFixed(1)));
-  state.ambientSeries.push(Number(a.toFixed(1)));
-  state.jacketSeries.push(Number(j.toFixed(1)));
 
   if (state.trendLabels.length > 12) {
     state.trendLabels.shift();
     state.bodySeries.shift();
-    state.ambientSeries.shift();
-    state.jacketSeries.shift();
   }
 }
 
@@ -375,8 +341,6 @@ function syncChart() {
 
   chart.data.labels = state.trendLabels;
   chart.data.datasets[0].data = state.bodySeries;
-  chart.data.datasets[1].data = state.ambientSeries;
-  chart.data.datasets[2].data = state.jacketSeries;
   chart.update();
 }
 
@@ -392,11 +356,9 @@ function simulateTick() {
     state.powerUsage = 1.1;
   } else if (state.mode === "cool") {
     state.bodyTemp = clamp(state.bodyTemp - Math.abs(randomDelta(0.22)), 34.0, 39.5);
-    state.jacketTemp = clamp(state.jacketTemp - Math.abs(randomDelta(0.25)), 22.0, 36.0);
     state.powerUsage = clamp(9 + randomDelta(0.9), 6, 12);
   } else if (state.mode === "heat") {
     state.bodyTemp = clamp(state.bodyTemp + Math.abs(randomDelta(0.2)), 34.0, 39.5);
-    state.jacketTemp = clamp(state.jacketTemp + Math.abs(randomDelta(0.25)), 22.0, 38.0);
     state.powerUsage = clamp(10 + randomDelta(1.1), 6, 14);
   } else {
     if (state.bodyTemp > 36.8) {
@@ -406,17 +368,15 @@ function simulateTick() {
     } else {
       state.bodyTemp = clamp(state.bodyTemp + randomDelta(0.07), 34.0, 39.5);
     }
-    state.jacketTemp = clamp(state.jacketTemp + randomDelta(0.15), 22.0, 38.0);
     state.powerUsage = clamp(8 + randomDelta(0.8), 4, 12);
   }
 
-  state.ambientTemp = clamp(state.ambientTemp + randomDelta(0.2), 19.0, 33.0);
   state.battery = clamp(state.battery - 0.18, 0, 100);
   state.lastSyncMs = Date.now();
 
   const now = new Date();
   const stamp = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-  pushSeries(stamp, state.bodyTemp, state.ambientTemp, state.jacketTemp);
+  pushSeries(stamp, state.bodyTemp);
 
   const status = computeStatus();
   if (status.mode === "alert" && state.pushEnabled) {
