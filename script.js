@@ -453,13 +453,39 @@ function bindEvents() {
 
   document.querySelectorAll(".theme-btn").forEach((button) => {
     button.addEventListener("click", () => {
+      const theme = button.dataset.theme;
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+
       document.querySelectorAll(".theme-btn").forEach((b) => b.classList.remove("active"));
       button.classList.add("active");
     });
   });
 }
 
+function initTheme() {
+  const savedTheme = localStorage.getItem("theme") || "system";
+  const themeButtons = document.querySelectorAll(".theme-btn");
+
+  // Set the theme
+  if (savedTheme === "system") {
+    document.documentElement.removeAttribute("data-theme");
+  } else {
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }
+
+  // Set active button
+  themeButtons.forEach((button) => {
+    if (button.dataset.theme === savedTheme) {
+      button.classList.add("active");
+    } else {
+      button.classList.remove("active");
+    }
+  });
+}
+
 function init() {
+  initTheme();
   bindEvents();
   setupChart();
   renderAll();
