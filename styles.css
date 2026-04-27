@@ -37,6 +37,82 @@
   }
 }
 
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .panel-head h3,
+[data-theme="dark"] .panel-head h4,
+[data-theme="dark"] .mode-caption,
+[data-theme="dark"] .metric-label,
+[data-theme="dark"] .metric-value,
+[data-theme="dark"] .metric-value small,
+[data-theme="dark"] .metric-sub,
+[data-theme="dark"] .battery-value,
+[data-theme="dark"] .soft-note,
+[data-theme="dark"] .status-pill,
+[data-theme="dark"] .alert-meta,
+[data-theme="dark"] .alert-item,
+[data-theme="dark"] .settings-card h4,
+[data-theme="dark"] .toggle-row p,
+[data-theme="dark"] .toggle-row small,
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .settings-card p,
+[data-theme="dark"] .settings-card span,
+[data-theme="dark"] .settings-card strong,
+[data-theme="dark"] .theme-btn {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .metric-card,
+[data-theme="dark"] .overview-card,
+[data-theme="dark"] .overview-card.is-normal,
+[data-theme="dark"] .overview-card.is-alert,
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .toggle-row {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .overview-card.is-normal,
+[data-theme="dark"] .overview-card.is-alert {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .soft-note {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .status-pill {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .mode-caption {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .battery-track {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .battery-track span {
+  background: #fff;
+}
+
+[data-theme="dark"] .alert-item.success {
+  background: rgba(11, 191, 104, 0.1);
+}
+
+[data-theme="dark"] .alert-item.info {
+  background: rgba(34, 99, 255, 0.1);
+}
+
+[data-theme="dark"] .muted {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .chip-mode {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -622,12 +698,12 @@ body {
 }
 
 [data-theme="dark"] .settings-card {
-  background: var(--surface);
-  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="dark"] .appearance-card {
-  background: linear-gradient(140deg, rgba(246, 237, 255, 0.1), rgba(243, 246, 255, 0.1));
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-row {
@@ -647,6 +723,17 @@ body {
   gap: 0.4rem;
   font-family: inherit;
   cursor: pointer;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .theme-btn {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .theme-btn:not(.active) {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .theme-btn i,
@@ -679,12 +766,22 @@ body {
   margin-bottom: 0.55rem;
 }
 
+[data-theme="dark"] .toggle-row {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .toggle-row p {
   margin: 0;
 }
 
 .toggle-row small {
   color: #6f7690;
+}
+
+[data-theme="dark"] .toggle-row p,
+[data-theme="dark"] .toggle-row small {
+  color: rgba(255, 255, 255, 0.84);
 }
 
 .switch {
@@ -733,6 +830,12 @@ body {
   padding: 0.08rem 0.45rem;
 }
 
+[data-theme="dark"] .tag-ok {
+  background: rgba(11, 191, 104, 0.16);
+  color: #d4ffe0;
+  border-color: rgba(11, 191, 104, 0.3);
+}
+
 .warning-note {
   margin: 0.75rem 0 0;
   padding: 0.6rem;
@@ -741,6 +844,41 @@ body {
   background: #fff8ea;
   color: #8a5200;
 }
+
+[data-theme="dark"] .warning-note {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .thermal-card label,
+[data-theme="dark"] .thermal-card small,
+[data-theme="dark"] .thermal-card h4 {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+[data-theme="dark"] .thermal-card input[type="range"] {
+  accent-color: #8b5cff;
+}
+
+[data-theme="dark"] .device-card p {
+  color: var(--ink);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .device-card span {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .text-btn {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme="dark"] .drawer-head h3,
+[data-theme="dark"] .drawer-head button {
+  color: var(--ink);
+}
+
 
 .thermal-card label {
   display: block;
